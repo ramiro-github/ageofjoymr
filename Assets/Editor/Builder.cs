@@ -43,7 +43,7 @@ class AndroidBuilder
 
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = scenes;
-        buildPlayerOptions.locationPathName = $"{buildPath}/AgeOfJoy.apk";
+        buildPlayerOptions.locationPathName = $"{buildPath}/AgeOfJoyMR.apk";
         buildPlayerOptions.target = BuildTarget.Android;
         buildPlayerOptions.options = BuildOptions.None;
         BuildPipeline.BuildPlayer(buildPlayerOptions);

@@ -7,6 +7,7 @@ You should have received a copy of the GNU General Public License along with thi
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 public class Cabinet
 {
@@ -85,58 +86,58 @@ public class Cabinet
         //boxCollider.center = bounds.center - gameObject.transform.position;
         // Adjust the center and size of the box collider to match the parent game object
         Vector3 centerOffset = bounds.center - gameObject.transform.position;
-        Vector3 adjustedCenter = new Vector3(centerOffset.x / gameObject.transform.lossyScale.x, 
-                                              centerOffset.y / gameObject.transform.lossyScale.y, 
+        Vector3 adjustedCenter = new Vector3(centerOffset.x / gameObject.transform.lossyScale.x,
+                                              centerOffset.y / gameObject.transform.lossyScale.y,
                                               centerOffset.z / gameObject.transform.lossyScale.z);
         boxCollider.center = adjustedCenter;
     }
 
-/*
-Another approach:
-private void addBoxCollider(GameObject gameObject)
-{
-    BoxCollider boxCollider = gameObject.GetComponent<BoxCollider>();
-    if (boxCollider == null)
-        boxCollider = gameObject.AddComponent<BoxCollider>();
-
-    Renderer[] childRenderers = gameObject.GetComponentsInChildren<Renderer>();
-
-    if (childRenderers.Length == 0)
+    /*
+    Another approach:
+    private void addBoxCollider(GameObject gameObject)
     {
-        ConfigManager.WriteConsoleWarning($"[addBoxCollider] {gameObject.name} No child renderers found.");
-        return;
+        BoxCollider boxCollider = gameObject.GetComponent<BoxCollider>();
+        if (boxCollider == null)
+            boxCollider = gameObject.AddComponent<BoxCollider>();
+
+        Renderer[] childRenderers = gameObject.GetComponentsInChildren<Renderer>();
+
+        if (childRenderers.Length == 0)
+        {
+            ConfigManager.WriteConsoleWarning($"[addBoxCollider] {gameObject.name} No child renderers found.");
+            return;
+        }
+
+        // Initialize minimum and maximum corner points in world space
+        Vector3 minWorldCorner = childRenderers[0].bounds.min;
+        Vector3 maxWorldCorner = childRenderers[0].bounds.max;
+
+        for (int i = 1; i < childRenderers.Length; i++)
+        {
+            Vector3 rendererMin = childRenderers[i].bounds.min;
+            Vector3 rendererMax = childRenderers[i].bounds.max;
+
+            // Update min and max corner points in world space
+            minWorldCorner = Vector3.Min(minWorldCorner, rendererMin);
+            maxWorldCorner = Vector3.Max(maxWorldCorner, rendererMax);
+        }
+
+        // Convert world space corner points to local space
+        Vector3 minLocalCorner = gameObject.transform.InverseTransformPoint(minWorldCorner);
+        Vector3 maxLocalCorner = gameObject.transform.InverseTransformPoint(maxWorldCorner);
+
+        // Calculate the center and size of the box collider in local space
+        Vector3 center = (minLocalCorner + maxLocalCorner) * 0.5f;
+        Vector3 size = maxLocalCorner - minLocalCorner;
+
+        // Adjust the center based on the parent's scale
+        Vector3 adjustedCenter = new Vector3(center.x / gameObject.transform.localScale.x,
+                                              center.y / gameObject.transform.localScale.y,
+                                              center.z / gameObject.transform.localScale.z);
+        boxCollider.center = adjustedCenter;
+        boxCollider.size = size;
     }
-
-    // Initialize minimum and maximum corner points in world space
-    Vector3 minWorldCorner = childRenderers[0].bounds.min;
-    Vector3 maxWorldCorner = childRenderers[0].bounds.max;
-
-    for (int i = 1; i < childRenderers.Length; i++)
-    {
-        Vector3 rendererMin = childRenderers[i].bounds.min;
-        Vector3 rendererMax = childRenderers[i].bounds.max;
-
-        // Update min and max corner points in world space
-        minWorldCorner = Vector3.Min(minWorldCorner, rendererMin);
-        maxWorldCorner = Vector3.Max(maxWorldCorner, rendererMax);
-    }
-
-    // Convert world space corner points to local space
-    Vector3 minLocalCorner = gameObject.transform.InverseTransformPoint(minWorldCorner);
-    Vector3 maxLocalCorner = gameObject.transform.InverseTransformPoint(maxWorldCorner);
-
-    // Calculate the center and size of the box collider in local space
-    Vector3 center = (minLocalCorner + maxLocalCorner) * 0.5f;
-    Vector3 size = maxLocalCorner - minLocalCorner;
-
-    // Adjust the center based on the parent's scale
-    Vector3 adjustedCenter = new Vector3(center.x / gameObject.transform.localScale.x,
-                                          center.y / gameObject.transform.localScale.y,
-                                          center.z / gameObject.transform.localScale.z);
-    boxCollider.center = adjustedCenter;
-    boxCollider.size = size;
-}
-*/
+    */
 
 
     private void toFloor()
@@ -162,7 +163,9 @@ private void addBoxCollider(GameObject gameObject)
         //add neccesary components
         //addRigidBody();
         addBoxCollider(gameObject);
-        toFloor();
+
+        if (SceneManager.GetActiveScene().name != "MR")
+            toFloor();
 
         if (!IsValid)
             throw new System.Exception($"[Cabinet] Malformed Cabinet {Name} , some parts are missing. List of expected parts: {string.Join(",", RequiredParts)}");
@@ -299,7 +302,16 @@ private void addBoxCollider(GameObject gameObject)
     public Cabinet SetMaterial(string part, Material mat)
     {
         if (!PartsExist(part))
-            throw new System.Exception($"Unknown part {part} to set material in cabinet {Name}");
+        {
+            if (SceneManager.GetActiveScene().name != "MR")
+            {
+                throw new System.Exception($"Unknown part {part} to set material in cabinet {Name}");
+            }
+
+            Debug.Log($"[DEBUG] Unknown part {part} to set material in cabinet {Name}");
+            return this;
+        }
+
 
         Renderer r = Parts(part).GetComponent<Renderer>();
         if (r != null)

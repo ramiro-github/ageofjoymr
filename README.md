@@ -1,4 +1,4 @@
-# AGE of Joy - A Retro Arcade Gallery Experience in VR 🕹️
+# AGE of Joy - A Retro Arcade Gallery Experience in VR MR 🕹️
 
 ![AGE of Joy Banner](https://cdn.sidequestvr.com/file/297897/gameplay-caratula.png?size=1024)
 

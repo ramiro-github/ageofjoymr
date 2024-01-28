@@ -6,6 +6,8 @@ You should have received a copy of the GNU General Public License along with thi
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public static class PlaceOnFloorFromBoxCollider
 {
@@ -90,7 +92,7 @@ public class PutOnFloor : MonoBehaviour
             return;
         }
 
-        if (! PlaceOnFloorFromBoxCollider.PlaceOnFloor(gameObject.transform, boxCollider))
+        if (!PlaceOnFloorFromBoxCollider.PlaceOnFloor(gameObject.transform, boxCollider))
             ConfigManager.WriteConsoleError($"[PutOnFloor.Start] can't re-position cabinet on floor after two intents {name}");
     }
 

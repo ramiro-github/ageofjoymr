@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 public class CabinetController : MonoBehaviour
 {
     public CabinetPosition game;
+    public bool isMR = false;
     public string Name;
 
     [Tooltip("Positions where the player can stay to load the cabinet")]

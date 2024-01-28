@@ -12,6 +12,9 @@ TagManager:
   - speaker
   - poster
   - NPC
+  - Cabinet
+  - Target
+  - Button
   layers:
   - Default
   - TransparentFX

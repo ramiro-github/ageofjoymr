@@ -16,7 +16,10 @@ using System;
 using CleverCrow.Fluid.BTs.Tasks;
 using CleverCrow.Fluid.BTs.Trees;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
+using UnityEngine.SceneManagement;
+
 #if UNITY_EDITOR
+
 using UnityEditor;
 #endif
 
@@ -123,6 +126,14 @@ public class LibretroScreenController : MonoBehaviour
 
     private bool playerIsInSomePosition()
     {
+
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName == "MR")
+        {
+            return true ;
+         }
+
         if (agentPlayerPositionComponents == null)
             return false;
 
