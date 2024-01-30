@@ -103,11 +103,11 @@ public class InsertCabinet : MonoBehaviour
 
             if (xAxisValue > 0)
             {
-                lastInstance.transform.Rotate(new Vector3(0, 25 * Time.deltaTime, 0));
+                lastInstance.transform.Rotate(new Vector3(0, 35 * Time.deltaTime, 0));
             }
             else if (xAxisValue < 0)
             {
-                lastInstance.transform.Rotate(new Vector3(0, -25 * Time.deltaTime, 0));
+                lastInstance.transform.Rotate(new Vector3(0, -35 * Time.deltaTime, 0));
             }
         }
     }

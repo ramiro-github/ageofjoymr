@@ -30,7 +30,7 @@ public class CabinetMenu : MonoBehaviour
 
     public GameObject InsertCabinet;
 
-    public TextMeshProUGUI textDescription;
+    public TextMeshProUGUI gameTitle;
 
     public Transform painelSelectTransform;
 
@@ -42,6 +42,8 @@ public class CabinetMenu : MonoBehaviour
     private bool isMenuActive = true;
 
     private bool isKeyPressed = false;
+
+    private int limitCabinetList = 9;
 
 
     private void Awake()
@@ -92,8 +94,12 @@ public class CabinetMenu : MonoBehaviour
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .Build();
 
-        for (int i = currentIndex; i < Mathf.Min(currentIndex + itemsPerPage, yamlFilesList.Count); i++)
+        //for (int i = currentIndex; i < Mathf.Min(currentIndex + itemsPerPage, yamlFilesList.Count); i++)
+        for (int i = 0; i < yamlFilesList.Count; i++)
         {
+            if (i > limitCabinetList)
+                break;
+
             using (var reader = new StreamReader(yamlFilesList[i].FullName))
             {
                 GameObject button = null;
@@ -109,8 +115,16 @@ public class CabinetMenu : MonoBehaviour
                     string nameGame = data["game"].ToString();
                     string nameVideo = videoData["file"].ToString();
 
-                    StartCoroutine(LoadImage(btn, nameFolder));
-                    btn.onClick.AddListener(() => OnButtonSelectCabinet(nameFolder, nameVideo));
+                    TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
+                    buttonText.text = nameGame;
+
+                    //StartCoroutine(LoadImage(btn, nameFolder));
+                    btn.onClick.AddListener(() => OnButtonSelectCabinet(nameFolder, nameVideo, nameGame));
+
+                    if (i == 0)
+                    {
+                        btn.onClick.Invoke();
+                    }
 
                 }
                 catch (Exception ex)
@@ -134,33 +148,36 @@ public class CabinetMenu : MonoBehaviour
         }
     }
 
-    IEnumerator LoadImage(Button btn, string nameFolder)
-    {
+    /*
+     IEnumerator LoadImage(Button btn, string nameFolder)
+     {
 
-        bool isSet = false;
+         bool isSet = false;
 
-        foreach (string ext in imageExtensions)
-        {
-            string imagePath = Path.Combine(ConfigManager.BaseDir + "/cabinetsdb/", nameFolder, "marquee." + ext);
+         foreach (string ext in imageExtensions)
+         {
+             string imagePath = Path.Combine(ConfigManager.BaseDir + "/cabinetsdb/", nameFolder, "marquee." + ext);
 
-            if (File.Exists(imagePath))
-            {
-                byte[] fileData = File.ReadAllBytes(imagePath);
-                Texture2D texture = new Texture2D(2, 2);
-                texture.LoadImage(fileData);
-                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                btn.GetComponent<Image>().sprite = sprite;
-                isSet = true;
-                break;
-            }
-        }
+             if (File.Exists(imagePath))
+             {
+                 byte[] fileData = File.ReadAllBytes(imagePath);
+                 Texture2D texture = new Texture2D(2, 2);
+                 texture.LoadImage(fileData);
+                 Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                 btn.GetComponent<Image>().sprite = sprite;
+                 isSet = true;
+                 break;
+             }
+         }
 
-        yield return null;
-    }
+         yield return null;
+     }
+     */
 
-    private void OnButtonSelectCabinet(string name, string video)
+    private void OnButtonSelectCabinet(string name, string video, string nameGame)
     {
         lastNameCabinetSelected = name;
+        gameTitle.text = nameGame;
 
         videoPlayer.Stop();
         videoPlayer.GetComponent<VideoPlayer>().url = null;
@@ -173,8 +190,12 @@ public class CabinetMenu : MonoBehaviour
     public void OnButtonInsertCabinet()
     {
 
+        Debug.Log("Chamou A");
+
         if (lastNameCabinetSelected != "")
         {
+            Debug.Log("Chamou B");
+
             videoPlayer.Stop();
             videoPlayer.GetComponent<VideoPlayer>().url = null;
             InsertCabinet.GetComponent<InsertCabinet>().instanceCabinet(lastNameCabinetSelected);
@@ -196,13 +217,14 @@ public class CabinetMenu : MonoBehaviour
     public void OnButtonNextList()
     {
         currentIndex += itemsPerPage;
+
         StartCoroutine(CreateInventory());
     }
 
     public void OnButtonBackList()
     {
         currentIndex -= itemsPerPage;
-        if (currentIndex < 0)
+        if (currentIndex <= 0)
         {
             currentIndex = 1;
         }

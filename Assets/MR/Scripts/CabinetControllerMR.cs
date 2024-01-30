@@ -25,7 +25,7 @@ public class CabinetControllerMR : MonoBehaviour
     private CabinetReplace cabinetReplaceComponent;
     private List<AgentScenePosition> AgentPlayerPositionComponents;
 
-    private GameObject InsertCabinet;
+    private GameObject insertCabinet;
 
     void Start()
     {
@@ -38,14 +38,14 @@ public class CabinetControllerMR : MonoBehaviour
                 AgentPlayerPositionComponents.Add(asp);
         }
 
-        InsertCabinet = GameObject.Find("InsertCabinet");
+        insertCabinet = GameObject.Find("InsertCabinet");
         StartCoroutine(load());
     }
 
     IEnumerator load()
     {
 
-        while (game == null || string.IsNullOrEmpty(game.CabinetDBName))
+        while ((game == null || string.IsNullOrEmpty(game.CabinetDBName)) && insertCabinet == null)
             yield return new WaitForSeconds(2f);
 
         if (game.CabInfo == null)
@@ -95,7 +95,7 @@ public class CabinetControllerMR : MonoBehaviour
 
             yield return new WaitForSeconds(0.03f);
 
-            InsertCabinet.GetComponent<InsertCabinet>().lastInstance = cab.gameObject;
+            insertCabinet.GetComponent<InsertCabinet>().lastInstance = cab.gameObject;
 
             yield return new WaitForSeconds(0.03f);
 

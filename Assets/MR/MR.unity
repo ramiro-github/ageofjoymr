@@ -287,11 +287,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1 &624266121 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4843289520591610317, guid: 6921523c0638a5d449100339ddfd74e6, type: 3}
-  m_PrefabInstance: {fileID: 1200320094}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &781688127
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,7 +311,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 781688127}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.133907, y: 0.8842504, z: -0.3589778}
+  m_LocalPosition: {x: -0.344, y: 0.8842504, z: -0.3589778}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -519,10 +514,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: AGEOfJoyHandLeftRMPrefab
       objectReference: {fileID: 0}
-    - target: {fileID: 3405534031356428505, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
-      propertyPath: InsertCabinet
-      value: 
-      objectReference: {fileID: 624266121}
+    - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -854,14 +869,14 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
