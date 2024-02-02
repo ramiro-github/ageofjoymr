@@ -475,6 +475,7 @@ GameObject:
   - component: {fileID: 5522837457333042539}
   - component: {fileID: 5945484743680962616}
   - component: {fileID: 5773984138227733873}
+  - component: {fileID: 5290884152310835517}
   m_Layer: 5
   m_Name: PanelBackground
   m_TagString: Untagged
@@ -564,6 +565,27 @@ MonoBehaviour:
   m_Spacing: {x: 0, y: -35.06}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!65 &5290884152310835517
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653276930788745400}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 569.38, y: 465.33, z: 1}
+  m_Center: {x: 0, y: 0, z: 5.7}
 --- !u!1 &851349133931577408
 GameObject:
   m_ObjectHideFlags: 0

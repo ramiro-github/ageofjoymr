@@ -290,6 +290,54 @@ PrefabInstance:
       propertyPath: VolumePrefab
       value: 
       objectReference: {fileID: 8013016026686888416, guid: 39405b287cfc44c7c8c0df5ff4b5f2b3, type: 3}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[0].Prefab
+      value: 
+      objectReference: {fileID: 102490448831091297, guid: f69b0f2d6a29a7a4e982354f5c07077a, type: 3}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[1].Prefab
+      value: 
+      objectReference: {fileID: 102490448831091297, guid: f69b0f2d6a29a7a4e982354f5c07077a, type: 3}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[2].Prefab
+      value: 
+      objectReference: {fileID: 102490448831091297, guid: f69b0f2d6a29a7a4e982354f5c07077a, type: 3}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[3].Prefab
+      value: 
+      objectReference: {fileID: 102490448831091297, guid: f69b0f2d6a29a7a4e982354f5c07077a, type: 3}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[0].ClassificationLabel
+      value: FLOOR
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[1].ClassificationLabel
+      value: OTHER
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[2].ClassificationLabel
+      value: WALL_FACE
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[3].ClassificationLabel
+      value: DESK
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[1]._editorClassificationIndex
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[2]._editorClassificationIndex
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066564014886996014, guid: fc5a9182afd2114498843471cadb390b, type: 3}
+      propertyPath: PrefabOverrides.Array.data[3]._editorClassificationIndex
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -385,7 +433,8 @@ PrefabInstance:
       value: AGEOfJoyHandRightMRPrefab
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5966173342636462248, guid: 6921523c0638a5d449100339ddfd74e6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6921523c0638a5d449100339ddfd74e6, type: 3}
@@ -884,7 +933,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
