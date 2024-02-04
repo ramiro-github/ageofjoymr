@@ -27,6 +27,8 @@ public class CabinetControllerMR : MonoBehaviour
 
     private GameObject insertCabinet;
 
+    public bool isAnchorSaved;
+
     void Start()
     {
 
@@ -95,7 +97,25 @@ public class CabinetControllerMR : MonoBehaviour
 
             yield return new WaitForSeconds(0.03f);
 
-            insertCabinet.GetComponent<InsertCabinet>().lastInstance = cab.gameObject;
+            if (isAnchorSaved == false)
+            {
+                insertCabinet.GetComponent<InsertCabinet>().lastInstance = cab.gameObject;
+                insertCabinet.GetComponent<InsertCabinet>().lastNameCabinetInsert = game.CabInfo.name;
+            }
+
+            GameObject oldEmptyGameObject = GameObject.Find(game.CabInfo.name);
+
+            if (oldEmptyGameObject)
+            {
+               Destroy(oldEmptyGameObject);
+            }
+
+            GameObject emptyGameObject = new GameObject();
+            emptyGameObject.name = game.CabInfo.name;
+
+            cab.gameObject.transform.SetParent(emptyGameObject.transform);
+
+            isAnchorSaved = false;
 
             yield return new WaitForSeconds(0.03f);
 

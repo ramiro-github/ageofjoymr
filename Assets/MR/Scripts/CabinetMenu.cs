@@ -10,6 +10,7 @@ using YamlDotNet.Serialization.NamingConventions;
 using UnityEngine.Networking;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
+using Newtonsoft.Json;
 
 
 [RequireComponent(typeof(GridLayoutGroup))]
@@ -45,13 +46,16 @@ public class CabinetMenu : MonoBehaviour
 
     private int limitCabinetList = 9;
 
+    private SpatialAnchorManager spatialAnchorManager;
+
+    private GameObject lastGameObjectSelect;
 
     private void Awake()
     {
 
         gridLayoutGroup = GetComponent<GridLayoutGroup>();
+        spatialAnchorManager = GameObject.Find("SpatialAnchorManager").GetComponent<SpatialAnchorManager>();
         StartCoroutine(loadFiles());
-
     }
 
     void Start()
@@ -94,7 +98,6 @@ public class CabinetMenu : MonoBehaviour
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .Build();
 
-        //for (int i = currentIndex; i < Mathf.Min(currentIndex + itemsPerPage, yamlFilesList.Count); i++)
         for (int i = 0; i < yamlFilesList.Count; i++)
         {
             if (i > limitCabinetList)
@@ -115,17 +118,17 @@ public class CabinetMenu : MonoBehaviour
                     string nameGame = data["game"].ToString();
                     string nameVideo = videoData["file"].ToString();
 
+                    spatialAnchorManager.managerInstanceSpatialAnchor(InsertCabinet, nameFolder);
+
                     TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
                     buttonText.text = nameGame;
 
-                    //StartCoroutine(LoadImage(btn, nameFolder));
                     btn.onClick.AddListener(() => OnButtonSelectCabinet(nameFolder, nameVideo, nameGame));
 
                     if (i == 0)
                     {
                         btn.onClick.Invoke();
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -148,32 +151,6 @@ public class CabinetMenu : MonoBehaviour
         }
     }
 
-    /*
-     IEnumerator LoadImage(Button btn, string nameFolder)
-     {
-
-         bool isSet = false;
-
-         foreach (string ext in imageExtensions)
-         {
-             string imagePath = Path.Combine(ConfigManager.BaseDir + "/cabinetsdb/", nameFolder, "marquee." + ext);
-
-             if (File.Exists(imagePath))
-             {
-                 byte[] fileData = File.ReadAllBytes(imagePath);
-                 Texture2D texture = new Texture2D(2, 2);
-                 texture.LoadImage(fileData);
-                 Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                 btn.GetComponent<Image>().sprite = sprite;
-                 isSet = true;
-                 break;
-             }
-         }
-
-         yield return null;
-     }
-     */
-
     private void OnButtonSelectCabinet(string name, string video, string nameGame)
     {
         lastNameCabinetSelected = name;
@@ -190,20 +167,34 @@ public class CabinetMenu : MonoBehaviour
     public void OnButtonInsertCabinet()
     {
 
-        Debug.Log("Chamou A");
-
         if (lastNameCabinetSelected != "")
         {
-            Debug.Log("Chamou B");
+            Vector3 position = new Vector3(0, 0, 0);
 
             videoPlayer.Stop();
             videoPlayer.GetComponent<VideoPlayer>().url = null;
-            InsertCabinet.GetComponent<InsertCabinet>().instanceCabinet(lastNameCabinetSelected);
+            InsertCabinet.GetComponent<InsertCabinet>().instanceCabinet(lastNameCabinetSelected, position, Quaternion.identity, false);
             lastNameCabinetSelected = "";
         }
         else
         {
             Debug.Log("[DEBUG] lastNameCabinetSelected não existe");
+        }
+    }
+
+    public void OnButtonDeleteCabinet()
+    {
+
+        if (lastNameCabinetSelected != "")
+        {
+            GameObject oldEmptyGameObject = GameObject.Find(lastNameCabinetSelected);
+
+            if (oldEmptyGameObject)
+            {
+                Destroy(oldEmptyGameObject);
+            }
+
+             spatialAnchorManager.deleteOldUuid(lastNameCabinetSelected);
         }
     }
 

@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using System;
 
 public class InsertCabinet : MonoBehaviour
 {
@@ -19,6 +23,8 @@ public class InsertCabinet : MonoBehaviour
     private float accumulatedTime = 0f;
 
     private int countCabinet = 0;
+
+    public string lastNameCabinetInsert = "";
 
     void Start()
     {
@@ -60,7 +66,7 @@ public class InsertCabinet : MonoBehaviour
         }
     }
 
-    public void instanceCabinet(string lastNameCabinetSelected)
+    public void instanceCabinet(string lastNameCabinetSelected, Vector3 position, Quaternion rotation, bool isAnchorSaved)
     {
 
         while (getFloor == false)
@@ -70,13 +76,14 @@ public class InsertCabinet : MonoBehaviour
 
         Debug.Log("[DEBUG] Gabinet instanciando ");
 
-        Vector3 position = new Vector3(0, floorPosition, 0);
+        Vector3 positionUpdateFloor = new Vector3(position.x, floorPosition, position.z);
 
-        GameObject _default = Instantiate(prefabGabinet, position, Quaternion.identity);
+        GameObject _default = Instantiate(prefabGabinet, positionUpdateFloor, rotation);
+        _default.GetComponent<CabinetControllerMR>().isAnchorSaved = isAnchorSaved;
         _default.GetComponent<CabinetControllerMR>().AgentPlayerPositions.Add(Player);
         _default.GetComponent<CabinetControllerMR>().game.CabinetDBName = lastNameCabinetSelected;
         _default.GetComponent<CabinetControllerMR>().game.Rom = lastNameCabinetSelected;
-        _default.GetComponent<CabinetControllerMR>().game.Position = countCabinet;
+        _default.GetComponent<CabinetControllerMR>().game.Position = 0;
 
         countCabinet++;
 
@@ -88,13 +95,15 @@ public class InsertCabinet : MonoBehaviour
         if (lastInstance != null)
         {
 
-            Vector3 newPosition = new Vector3(transform.position.x, floorPosition, transform.position.z);
+            Vector3 newPosition = new Vector3(transform.position.x, floorPosition + 0.05f, transform.position.z);
             lastInstance.transform.position = newPosition;
 
             if (OVRInput.GetDown(OVRInput.RawButton.B) || Input.GetKeyDown(KeyCode.Return))
             {
                 lastInstance.transform.position = new Vector3(lastInstance.transform.position.x, floorPosition, lastInstance.transform.position.z);
-                lastInstance.AddComponent<OVRSpatialAnchor>();
+                OVRSpatialAnchor workingAnchor = lastInstance.AddComponent<OVRSpatialAnchor>();
+
+                StartCoroutine(anchorCreated(workingAnchor));
 
                 lastInstance = null;
             }
@@ -110,5 +119,31 @@ public class InsertCabinet : MonoBehaviour
                 lastInstance.transform.Rotate(new Vector3(0, -35 * Time.deltaTime, 0));
             }
         }
+    }
+
+    IEnumerator anchorCreated(OVRSpatialAnchor osAnchor)
+    {
+        while (!osAnchor.Created && !osAnchor.Localized)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        osAnchor.Save((anchor, success) =>
+        {
+
+            if (success)
+            {
+                Debug.Log("Anchor " + osAnchor.Uuid.ToString());
+
+                string filePath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb", lastNameCabinetInsert, "SpatialAnchor.json");
+
+                var UuidObject = new { Uuid = osAnchor.Uuid.ToString() };
+
+                string json = JsonConvert.SerializeObject(UuidObject, Formatting.Indented);
+
+                File.WriteAllText(filePath, json);
+            }
+
+        });
     }
 }

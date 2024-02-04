@@ -4251,7 +4251,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4061377275179615693
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4270,7 +4270,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0.144}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 208.7, y: -192.4}
+  m_AnchoredPosition: {x: 221, y: -192}
   m_SizeDelta: {x: 24.84552, y: -69.99988}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &302324985474832045
@@ -4663,9 +4663,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1875965858714069623}
         m_TargetAssemblyTypeName: CabinetMenu, Assembly-CSharp
-        m_MethodName: OnButtonInsertCabinet
+        m_MethodName: OnButtonDeleteCabinet
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
