@@ -11,11 +11,13 @@ using UnityEngine.Networking;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
+using System.Linq;
 
 
 [RequireComponent(typeof(GridLayoutGroup))]
 public class CabinetMenu : MonoBehaviour
 {
+
     public GameObject ButtonSelectCabinetPrefab;
     public int columns = 4;
     public int rows = 10;
@@ -29,7 +31,7 @@ public class CabinetMenu : MonoBehaviour
 
     private string lastNameCabinetSelected = "";
 
-    public GameObject InsertCabinet;
+    private GameObject insertCabinetGameObject;
 
     public TextMeshProUGUI gameTitle;
 
@@ -52,18 +54,19 @@ public class CabinetMenu : MonoBehaviour
 
     private void Awake()
     {
-
         gridLayoutGroup = GetComponent<GridLayoutGroup>();
         spatialAnchorManager = GameObject.Find("SpatialAnchorManager").GetComponent<SpatialAnchorManager>();
-        StartCoroutine(loadFiles());
     }
 
     void Start()
     {
-        InsertCabinet = GameObject.Find("InsertCabinet");
+        insertCabinetGameObject = GameObject.Find("InsertCabinet");
+        StartCoroutine(loadFiles());
     }
 
-    IEnumerator loadFiles()
+
+
+    public IEnumerator loadFiles()
     {
 
         Debug.Log("[DEBUG] Yaml carregando");
@@ -79,9 +82,7 @@ public class CabinetMenu : MonoBehaviour
                 yamlFilesList.Add(yamlFiles[0]);
             }
         }
-
         yield return new WaitForSeconds(0.05f);
-
         Debug.Log("[DEBUG] Yaml carregado");
 
         StartCoroutine(CreateInventory());
@@ -89,8 +90,6 @@ public class CabinetMenu : MonoBehaviour
 
     IEnumerator CreateInventory()
     {
-
-        DestroyChildren(painelSelectTransform);
 
         Debug.Log("[DEBUG] Listagem carregando");
 
@@ -118,8 +117,6 @@ public class CabinetMenu : MonoBehaviour
                     string nameGame = data["game"].ToString();
                     string nameVideo = videoData["file"].ToString();
 
-                    spatialAnchorManager.managerInstanceSpatialAnchor(InsertCabinet, nameFolder);
-
                     TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
                     buttonText.text = nameGame;
 
@@ -129,6 +126,7 @@ public class CabinetMenu : MonoBehaviour
                     {
                         btn.onClick.Invoke();
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -141,14 +139,6 @@ public class CabinetMenu : MonoBehaviour
         Debug.Log("[DEBUG] Listagem carregado");
 
         yield return new WaitForSeconds(0.05f);
-    }
-
-    void DestroyChildren(Transform parent)
-    {
-        foreach (Transform child in parent)
-        {
-            Destroy(child.gameObject);
-        }
     }
 
     private void OnButtonSelectCabinet(string name, string video, string nameGame)
@@ -173,7 +163,7 @@ public class CabinetMenu : MonoBehaviour
 
             videoPlayer.Stop();
             videoPlayer.GetComponent<VideoPlayer>().url = null;
-            InsertCabinet.GetComponent<InsertCabinet>().instanceCabinet(lastNameCabinetSelected, position, Quaternion.identity, false);
+            insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(lastNameCabinetSelected, position, Quaternion.identity, false);
             lastNameCabinetSelected = "";
         }
         else
@@ -194,7 +184,7 @@ public class CabinetMenu : MonoBehaviour
                 Destroy(oldEmptyGameObject);
             }
 
-             spatialAnchorManager.deleteOldUuid(lastNameCabinetSelected);
+            spatialAnchorManager.deleteOldUuid(lastNameCabinetSelected);
         }
     }
 

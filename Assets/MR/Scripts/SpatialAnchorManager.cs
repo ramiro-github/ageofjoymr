@@ -5,27 +5,37 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
+using System.Collections;
 
 public class SpatialAnchorManager : MonoBehaviour
 {
-
     public class MyJsonObject
     {
         public string Uuid { get; set; }
+        public string name { get; set; }
     }
 
-    public void LoadAnchorByUuid(string uuid, string name, GameObject InsertCabinet)
+    public GameObject cabPersistenceManager;
+
+    public List<OVRSpatialAnchor.UnboundAnchor> unboundAnchorsList = new List<OVRSpatialAnchor.UnboundAnchor>();
+
+
+    void Start()
     {
-        Guid guidUuid = Guid.Parse(uuid);
+        StartCoroutine(LoadAllAnchor());
+    }
+
+    private IEnumerator LoadAllAnchor()
+    {
+
+        Debug.Log("[DEBUG] Inicio Carregar anchoras");
 
         OVRSpatialAnchor.LoadOptions options = new OVRSpatialAnchor.LoadOptions
         {
             Timeout = 0,
             StorageLocation = OVRSpace.StorageLocation.Local,
-            Uuids = new List<Guid> { guidUuid }
+            Uuids = GetSavedAnchorUUIDs()
         };
-
-        Debug.Log("[DEBUG] Procurando a anchora local ");
 
         OVRSpatialAnchor.LoadUnboundAnchors(options, anchorSavedUUIDList =>
         {
@@ -33,9 +43,8 @@ public class SpatialAnchorManager : MonoBehaviour
             {
                 if (anchor.Localized)
                 {
-                    Debug.Log("[DEBUG] Anchora Localizada");
-                    instanceCab(name, InsertCabinet, anchor);
-                    break;
+                    unboundAnchorsList.Add(anchor);
+                    Debug.Log("[DEBUG] Anchora localizada: " + anchor.Uuid);
                 }
                 else
                 {
@@ -44,53 +53,18 @@ public class SpatialAnchorManager : MonoBehaviour
 
                         if (success)
                         {
-                            instanceCab(name, InsertCabinet, a);
-                            Debug.Log("[DEBUG] Anchora Localizada em anchor.Localize");
-                        }
-                        else
-                        {
-                            Debug.Log("[DEBUG] Anchora nao Localizada em anchor.Localize");
+                            unboundAnchorsList.Add(anchor);
+                            Debug.Log("[DEBUG] Anchora localizada depois: " + anchor.Uuid);
                         }
 
                     });
-
-                    Debug.Log("[DEBUG] Anchora Nao Localizada");
                 }
             }
         });
-    }
 
-    void instanceCab(string name, GameObject InsertCabinet, OVRSpatialAnchor.UnboundAnchor anchor)
-    {
-        Debug.Log("[DEBUG] Instanciando Gabinete salvo posição");
-        InsertCabinet.GetComponent<InsertCabinet>().instanceCabinet(name, anchor.Pose.position, anchor.Pose.rotation, true);
-    }
+        yield return new WaitForSeconds(0.05f);
 
-    public void managerInstanceSpatialAnchor(GameObject InsertCabinet, string nameFolder)
-    {
-        string filePath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb", nameFolder, "SpatialAnchor.json");
-
-        if (File.Exists(filePath))
-        {
-            string jsonContent = File.ReadAllText(filePath);
-            MyJsonObject myObject = JsonConvert.DeserializeObject<MyJsonObject>(jsonContent);
-
-            Debug.Log("[DEBUG] SpatialAnchor.json Existe! ");
-
-            if (myObject.Uuid != "")
-            {
-                Debug.Log("[DEBUG] SpatialAnchor.json tem posição salva ");
-                LoadAnchorByUuid(myObject.Uuid, nameFolder, InsertCabinet);
-            }
-            else
-            {
-                Debug.Log("[DEBUG] SpatialAnchor.json nao tem posição salva ");
-            }
-        }
-        else
-        {
-            Debug.Log("[DEBUG] SpatialAnchor.json Nao Existe! ");
-        }
+        StartCoroutine(cabPersistenceManager.GetComponent<CabPersistenceManager>().instanceCab(this));
     }
 
     public void deleteOldUuid(string nameFolder)
@@ -107,5 +81,51 @@ public class SpatialAnchorManager : MonoBehaviour
         string updatedJsonContent = JsonConvert.SerializeObject(myObject, Formatting.Indented);
 
         File.WriteAllText(filePath, updatedJsonContent);
+    }
+
+    public string getUuidCab(string nameFolder)
+    {
+        string filePath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb", nameFolder, "SpatialAnchor.json");
+
+        if (File.Exists(filePath))
+        {
+            string jsonContent = File.ReadAllText(filePath);
+            MyJsonObject myObject = JsonConvert.DeserializeObject<MyJsonObject>(jsonContent);
+
+            return myObject.Uuid;
+        }
+
+        return "";
+    }
+
+
+    public List<Guid> GetSavedAnchorUUIDs()
+    {
+        List<Guid> uuids = new List<Guid>();
+        string cabinetsdbPath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb");
+        DirectoryInfo directoryInfo = new DirectoryInfo(cabinetsdbPath);
+
+        if (directoryInfo.Exists)
+        {
+            DirectoryInfo[] folders = directoryInfo.GetDirectories();
+
+            foreach (DirectoryInfo folder in folders)
+            {
+                string filePath = Path.Combine(cabinetsdbPath, folder.Name, "SpatialAnchor.json");
+
+                if (File.Exists(filePath))
+                {
+                    string jsonContent = File.ReadAllText(filePath);
+                    var uuidObject = JsonConvert.DeserializeObject<MyJsonObject>(jsonContent);
+                    if (uuidObject.Uuid != "")
+                    {
+                        Guid uuid = Guid.Parse(uuidObject.Uuid);
+                        uuids.Add(uuid);
+                    }
+                }
+            }
+        }
+
+        return uuids;
     }
 }
