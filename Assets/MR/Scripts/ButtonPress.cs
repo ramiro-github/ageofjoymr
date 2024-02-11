@@ -17,7 +17,6 @@ public class ButtonPress : MonoBehaviour
 
             if (button != null)
             {
-                Debug.Log("[DEBUG] Pressionou o botão");
 
                 OVRInput.SetControllerVibration(.3f, 0.3f, OVRInput.Controller.RTouch);
 
@@ -36,8 +35,6 @@ public class ButtonPress : MonoBehaviour
 
             if (button != null)
             {
-                Debug.Log("[DEBUG] Pressionou o botão");
-
                 OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
 
                 button.onClick.Invoke();

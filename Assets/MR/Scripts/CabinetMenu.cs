@@ -69,8 +69,6 @@ public class CabinetMenu : MonoBehaviour
     public IEnumerator loadFiles()
     {
 
-        Debug.Log("[DEBUG] Yaml carregando");
-
         DirectoryInfo directoryInfo = new DirectoryInfo(@"" + ConfigManager.BaseDir + "/cabinetsdb/");
         DirectoryInfo[] folders = directoryInfo.GetDirectories();
 
@@ -83,15 +81,12 @@ public class CabinetMenu : MonoBehaviour
             }
         }
         yield return new WaitForSeconds(0.05f);
-        Debug.Log("[DEBUG] Yaml carregado");
 
         StartCoroutine(CreateInventory());
     }
 
     IEnumerator CreateInventory()
     {
-
-        Debug.Log("[DEBUG] Listagem carregando");
 
         IDeserializer deserializator = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -131,12 +126,9 @@ public class CabinetMenu : MonoBehaviour
                 catch (Exception ex)
                 {
                     Destroy(button);
-                    Debug.Log("[DEBUG] Erro em carregar a listagem: " + ex.Message);
                 }
             }
         }
-
-        Debug.Log("[DEBUG] Listagem carregado");
 
         yield return new WaitForSeconds(0.05f);
     }
@@ -168,7 +160,6 @@ public class CabinetMenu : MonoBehaviour
         }
         else
         {
-            Debug.Log("[DEBUG] lastNameCabinetSelected não existe");
         }
     }
 

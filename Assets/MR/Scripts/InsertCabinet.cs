@@ -41,8 +41,6 @@ public class InsertCabinet : MonoBehaviour
         while (getFloor == false)
         {
 
-            Debug.Log("[DEBUG] Tentando Pegar posição chao");
-
             OVRSceneAnchor[] sceneAnchors = FindObjectsOfType<OVRSceneAnchor>();
 
             for (int i = 0; i < sceneAnchors.Length; i++)
@@ -56,7 +54,6 @@ public class InsertCabinet : MonoBehaviour
                 {
 
                     floorPosition = anchor.transform.position.y;
-                    Debug.Log("[DEBUG] Posição " + floorPosition);
                     getFloor = true;
                     break;
                 }
@@ -74,8 +71,6 @@ public class InsertCabinet : MonoBehaviour
             StartCoroutine(getFloorPosition());
         }
 
-        Debug.Log("[DEBUG] Gabinet instanciando ");
-
         Vector3 positionUpdateFloor = new Vector3(position.x, floorPosition, position.z);
 
         GameObject _default = Instantiate(prefabGabinet, positionUpdateFloor, rotation);
@@ -87,7 +82,6 @@ public class InsertCabinet : MonoBehaviour
 
         countCabinet++;
 
-        Debug.Log("[DEBUG] Gabinet instanciado ");
     }
 
     void Update()

@@ -15,20 +15,67 @@ public class SpatialAnchorManager : MonoBehaviour
         public string name { get; set; }
     }
 
-    public GameObject cabPersistenceManager;
+    public GameObject instancePrefabAnchorManager;
 
     public List<OVRSpatialAnchor.UnboundAnchor> unboundAnchorsList = new List<OVRSpatialAnchor.UnboundAnchor>();
 
+    private OVRSceneManager ovrSceneManager;
 
     void Start()
     {
+        StartCoroutine(loadOVRScene());
         StartCoroutine(LoadAllAnchor());
+    }
+
+    private IEnumerator loadOVRScene()
+    {
+        while (ovrSceneManager == null)
+        {
+            ovrSceneManager = FindObjectOfType<OVRSceneManager>();
+            if (ovrSceneManager != null)
+            {
+                ovrSceneManager.SceneModelLoadedSuccessfully += OnSceneModelLoadedSuccessfully;
+                break;
+            }
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private void OnSceneModelLoadedSuccessfully()
+    {
+        StartCoroutine(loadOVRSceneManager());
+    }
+
+    private IEnumerator loadOVRSceneManager()
+    {
+        Debug.Log("[DEBUG] Start loadOVRSceneManager");
+        yield return new WaitForEndOfFrame();
+
+        OVRSceneAnchor[] sceneAnchors = FindObjectsOfType<OVRSceneAnchor>();
+
+        if (sceneAnchors != null)
+        {
+            for (int i = 0; i < sceneAnchors.Length; i++)
+            {
+                OVRSceneAnchor anchor = sceneAnchors[i];
+
+                OVRSemanticClassification classification = anchor.GetComponent<OVRSemanticClassification>();
+
+                Debug.Log("[DEBUG] OVRSceneAnchor label: " + classification.Labels[0]);
+
+                if (classification.Contains(OVRSceneManager.Classification.WallArt))
+                {
+                    Debug.Log("[DEBUG] Encontrou arte de parede: " + classification.Labels[0]);
+                    instancePrefabAnchorManager.GetComponent<InstancePrefabAnchorManager>().instanceFrame(anchor);
+                }
+            }
+        }
+
+        Debug.Log("[DEBUG] Final loadOVRSceneManager");
     }
 
     private IEnumerator LoadAllAnchor()
     {
-
-        Debug.Log("[DEBUG] Inicio Carregar anchoras");
 
         OVRSpatialAnchor.LoadOptions options = new OVRSpatialAnchor.LoadOptions
         {
@@ -44,7 +91,6 @@ public class SpatialAnchorManager : MonoBehaviour
                 if (anchor.Localized)
                 {
                     unboundAnchorsList.Add(anchor);
-                    Debug.Log("[DEBUG] Anchora localizada: " + anchor.Uuid);
                 }
                 else
                 {
@@ -54,7 +100,6 @@ public class SpatialAnchorManager : MonoBehaviour
                         if (success)
                         {
                             unboundAnchorsList.Add(anchor);
-                            Debug.Log("[DEBUG] Anchora localizada depois: " + anchor.Uuid);
                         }
 
                     });
@@ -63,8 +108,7 @@ public class SpatialAnchorManager : MonoBehaviour
         });
 
         yield return new WaitForSeconds(0.05f);
-
-        StartCoroutine(cabPersistenceManager.GetComponent<CabPersistenceManager>().instanceCab(this));
+        StartCoroutine(instancePrefabAnchorManager.GetComponent<InstancePrefabAnchorManager>().instanceCab(this));
     }
 
     public void deleteOldUuid(string nameFolder)
@@ -97,7 +141,6 @@ public class SpatialAnchorManager : MonoBehaviour
 
         return "";
     }
-
 
     public List<Guid> GetSavedAnchorUUIDs()
     {
