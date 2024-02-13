@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Threading.Tasks;
+using System.IO;
 
 //[RequireComponent(typeof(CabinetReplace))]
 public class CabinetControllerMR : MonoBehaviour
@@ -25,7 +26,7 @@ public class CabinetControllerMR : MonoBehaviour
     private CabinetReplace cabinetReplaceComponent;
     private List<AgentScenePosition> AgentPlayerPositionComponents;
 
-    private GameObject insertCabinet;
+    public GameObject insertCabinet;
 
     public bool isAnchorSaved;
 
@@ -40,14 +41,13 @@ public class CabinetControllerMR : MonoBehaviour
                 AgentPlayerPositionComponents.Add(asp);
         }
 
-        insertCabinet = GameObject.Find("InsertCabinet");
         StartCoroutine(load());
     }
 
     IEnumerator load()
     {
 
-        while ((game == null || string.IsNullOrEmpty(game.CabinetDBName)) && insertCabinet == null)
+        while ((game == null || string.IsNullOrEmpty(game.CabinetDBName)) || insertCabinet == null)
             yield return new WaitForSeconds(2f);
 
         if (game.CabInfo == null)
@@ -100,18 +100,17 @@ public class CabinetControllerMR : MonoBehaviour
             if (isAnchorSaved == false)
             {
                 insertCabinet.GetComponent<InsertCabinet>().lastInstance = cab.gameObject;
-                insertCabinet.GetComponent<InsertCabinet>().lastNameCabinetInsert = game.CabInfo.name;
             }
 
-            GameObject oldEmptyGameObject = GameObject.Find(game.CabInfo.name);
+            GameObject oldEmptyGameObject = GameObject.Find(Path.GetFileNameWithoutExtension(game.CabInfo.rom));
 
             if (oldEmptyGameObject)
             {
-               Destroy(oldEmptyGameObject);
+                Destroy(oldEmptyGameObject);
             }
 
             GameObject emptyGameObject = new GameObject();
-            emptyGameObject.name = game.CabInfo.name;
+            emptyGameObject.name = Path.GetFileNameWithoutExtension(game.CabInfo.rom);
 
             cab.gameObject.transform.SetParent(emptyGameObject.transform);
 

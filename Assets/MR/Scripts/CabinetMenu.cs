@@ -52,6 +52,13 @@ public class CabinetMenu : MonoBehaviour
 
     private GameObject lastGameObjectSelect;
 
+    public Dictionary<string, string> lastCabInformationSelected = new Dictionary<string, string>();
+
+    private GameObject buttonInsert;
+    private GameObject buttonDelete;
+
+    private List<string> cabinetInserted = new List<string>();
+
     private void Awake()
     {
         gridLayoutGroup = GetComponent<GridLayoutGroup>();
@@ -61,13 +68,27 @@ public class CabinetMenu : MonoBehaviour
     void Start()
     {
         insertCabinetGameObject = GameObject.Find("InsertCabinet");
+
         StartCoroutine(loadFiles());
     }
 
-
-
     public IEnumerator loadFiles()
     {
+        while (
+            buttonDelete == null ||
+            buttonInsert == null ||
+            spatialAnchorManager == null ||
+            insertCabinetGameObject == null
+            )
+        {
+
+            insertCabinetGameObject = GameObject.Find("InsertCabinet");
+            spatialAnchorManager = GameObject.Find("SpatialAnchorManager").GetComponent<SpatialAnchorManager>();
+            buttonInsert = GameObject.Find("ButtonInsert");
+            buttonDelete = GameObject.Find("ButtonDelete");
+
+            yield return new WaitForSeconds(0.05f);
+        }
 
         DirectoryInfo directoryInfo = new DirectoryInfo(@"" + ConfigManager.BaseDir + "/cabinetsdb/");
         DirectoryInfo[] folders = directoryInfo.GetDirectories();
@@ -99,23 +120,42 @@ public class CabinetMenu : MonoBehaviour
 
             using (var reader = new StreamReader(yamlFilesList[i].FullName))
             {
+
                 GameObject button = null;
+
                 try
                 {
+
                     var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
                     Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
 
                     button = Instantiate(ButtonSelectCabinetPrefab, painelSelectTransform);
                     Button btn = button.GetComponent<Button>();
 
-                    string nameFolder = data["name"].ToString();
-                    string nameGame = data["game"].ToString();
-                    string nameVideo = videoData["file"].ToString();
+                    string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
+
+                    string game = data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()) ?
+                     data["game"].ToString() :
+                     Path.GetFileNameWithoutExtension(data["rom"].ToString());
+
+                    string video = videoData.ContainsKey("file") && !string.IsNullOrEmpty(videoData["file"].ToString()) ?
+                    videoData["file"].ToString() :
+                    "";
+
+                    string rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
 
                     TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
-                    buttonText.text = nameGame;
+                    buttonText.text = game;
 
-                    btn.onClick.AddListener(() => OnButtonSelectCabinet(nameFolder, nameVideo, nameGame));
+                    Dictionary<string, string> cabInformation = new Dictionary<string, string>
+                    {
+                        {"folderName", folderName},
+                        {"game", game},
+                        {"video", video},
+                        {"rom", rom}
+                    };
+
+                    btn.onClick.AddListener(() => OnButtonSelectCabinet(cabInformation));
 
                     if (i == 0)
                     {
@@ -133,74 +173,70 @@ public class CabinetMenu : MonoBehaviour
         yield return new WaitForSeconds(0.05f);
     }
 
-    private void OnButtonSelectCabinet(string name, string video, string nameGame)
+    private void OnButtonSelectCabinet(Dictionary<string, string> cabInformation)
     {
-        lastNameCabinetSelected = name;
-        gameTitle.text = nameGame;
+
+        Debug.Log("--->" + cabInformation["folderName"]);
+        Debug.Log("--->" + cabInformation["game"]);
+        Debug.Log("--->" + cabInformation["video"]);
+        Debug.Log("--->" + cabInformation["rom"]);
+
+        buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
+        buttonDelete.GetComponent<Button>().onClick.RemoveAllListeners();
+
+        lastCabInformationSelected = cabInformation;
+        gameTitle.text = cabInformation["game"];
 
         videoPlayer.Stop();
         videoPlayer.GetComponent<VideoPlayer>().url = null;
 
-        string videoURL = ConfigManager.BaseDir + "/cabinetsdb/" + name + "/" + video;
-        videoPlayer.GetComponent<VideoPlayer>().url = videoURL;
-        videoPlayer.Play();
+        if (cabInformation["video"] != "")
+        {
+            string videoURL = ConfigManager.BaseDir + "/cabinetsdb/" + cabInformation["folderName"] + "/" + cabInformation["video"];
+            videoPlayer.GetComponent<VideoPlayer>().url = videoURL;
+            videoPlayer.Play();
+        }
+
+        buttonInsert.GetComponent<Button>().onClick.AddListener(() => OnButtonInsertCabinet(cabInformation));
+        buttonDelete.GetComponent<Button>().onClick.AddListener(() => OnButtonDeleteCabinet(cabInformation));
     }
 
-    public void OnButtonInsertCabinet()
+    public void OnButtonInsertCabinet(Dictionary<string, string> cabInformation)
     {
 
-        if (lastNameCabinetSelected != "")
+        if (cabInformation.Count != 0 && !cabinetInserted.Contains(cabInformation["rom"]))
         {
+            buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
+
+            cabinetInserted.Add(cabInformation["rom"]);
+
             Vector3 position = new Vector3(0, 0, 0);
 
             videoPlayer.Stop();
             videoPlayer.GetComponent<VideoPlayer>().url = null;
-            insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(lastNameCabinetSelected, position, Quaternion.identity, false);
-            lastNameCabinetSelected = "";
-        }
-        else
-        {
+            insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(cabInformation, position, Quaternion.identity, false);
         }
     }
 
-    public void OnButtonDeleteCabinet()
+    public void OnButtonDeleteCabinet(Dictionary<string, string> cabInformation)
     {
 
-        if (lastNameCabinetSelected != "")
+        if (cabInformation.Count != 0)
         {
-            GameObject oldEmptyGameObject = GameObject.Find(lastNameCabinetSelected);
+
+            buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
+            buttonDelete.GetComponent<Button>().onClick.RemoveAllListeners();
+
+            cabinetInserted.Remove(cabInformation["rom"]);
+            GameObject oldEmptyGameObject = GameObject.Find(cabInformation["rom"]);
 
             if (oldEmptyGameObject)
             {
                 Destroy(oldEmptyGameObject);
             }
 
-            spatialAnchorManager.deleteOldUuid(lastNameCabinetSelected);
+            spatialAnchorManager.deleteOldUuid(cabInformation["folderName"]);
         }
-    }
-
-    public void OnButtonBackToVR()
-    {
-        Resources.UnloadUnusedAssets();
-        SceneManager.LoadScene("IntroGallery");
-    }
-
-
-    public void OnButtonNextList()
-    {
-        currentIndex += itemsPerPage;
-
-        StartCoroutine(CreateInventory());
-    }
-
-    public void OnButtonBackList()
-    {
-        currentIndex -= itemsPerPage;
-        if (currentIndex <= 0)
-        {
-            currentIndex = 1;
-        }
-        StartCoroutine(CreateInventory());
     }
 
     void Update()

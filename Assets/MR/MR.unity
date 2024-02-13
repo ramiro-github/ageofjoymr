@@ -581,10 +581,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: AGEOfJoyHandLeftRMPrefab
       objectReference: {fileID: 0}
-    - target: {fileID: 851349133931630892, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -780,6 +776,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   passthroughLayer: {fileID: 1111586384}
   prefabFrame: {fileID: 2674729246560200642, guid: 9685c872103e4c341ab5258be6df3984, type: 3}
+  availableImages: []
 --- !u!1 &1499757393
 GameObject:
   m_ObjectHideFlags: 0
