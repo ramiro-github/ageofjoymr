@@ -108,78 +108,91 @@ public class CabinetMenu : MonoBehaviour
 
     IEnumerator CreateInventory()
     {
+         IDeserializer deserializator = new DeserializerBuilder()
+         .WithNamingConvention(CamelCaseNamingConvention.Instance)
+         .Build();
 
-        IDeserializer deserializator = new DeserializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-        .Build();
+         for (int i = 0; i < yamlFilesList.Count; i++)
+         {
+             if (i > limitCabinetList)
+                 break;
 
-        for (int i = 0; i < yamlFilesList.Count; i++)
-        {
-            if (i > limitCabinetList)
-                break;
+             using (var reader = new StreamReader(yamlFilesList[i].FullName))
+             {
 
-            using (var reader = new StreamReader(yamlFilesList[i].FullName))
-            {
+                 GameObject button = null;
 
-                GameObject button = null;
+                 try
+                 {
 
-                try
-                {
+                     var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
+                     Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
 
-                    var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
-                    Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
+                     button = Instantiate(ButtonSelectCabinetPrefab, painelSelectTransform);
+                     Button btn = button.GetComponent<Button>();
 
-                    button = Instantiate(ButtonSelectCabinetPrefab, painelSelectTransform);
-                    Button btn = button.GetComponent<Button>();
+                     string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
 
-                    string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
+                     string game = "Name Not Found";
 
-                    string game = data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()) ?
-                     data["game"].ToString() :
-                     Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                     if (data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()))
+                     {
+                         game = data["game"].ToString();
+                     }
+                     else if (data.ContainsKey("name") && !string.IsNullOrEmpty(data["name"].ToString()))
+                     {
+                         game = data["name"].ToString();
+                     }
+                     else if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
+                     {
+                         game = data["rom"].ToString();
+                     }
 
-                    string video = videoData.ContainsKey("file") && !string.IsNullOrEmpty(videoData["file"].ToString()) ?
-                    videoData["file"].ToString() :
-                    "";
+                     string video = "";
 
-                    string rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                     if (videoData.ContainsKey("file") && !string.IsNullOrEmpty(videoData["file"].ToString()))
+                     {
+                         video = videoData["file"].ToString();
+                     }
 
-                    TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
-                    buttonText.text = game;
+                     string rom = "";
 
-                    Dictionary<string, string> cabInformation = new Dictionary<string, string>
-                    {
-                        {"folderName", folderName},
-                        {"game", game},
-                        {"video", video},
-                        {"rom", rom}
-                    };
+                     if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
+                     {
+                         rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                     }
 
-                    btn.onClick.AddListener(() => OnButtonSelectCabinet(cabInformation));
+                     TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
+                     buttonText.text = game;
 
-                    if (i == 0)
-                    {
-                        btn.onClick.Invoke();
-                    }
+                     Dictionary<string, string> cabInformation = new Dictionary<string, string>
+                     {
+                         {"folderName", folderName},
+                         {"game", game},
+                         {"video", video},
+                         {"rom", rom}
+                     };
 
-                }
-                catch (Exception ex)
-                {
-                    Destroy(button);
-                }
-            }
-        }
+                     btn.onClick.AddListener(() => OnButtonSelectCabinet(cabInformation));
+
+                     if (i == 0)
+                     {
+                         btn.onClick.Invoke();
+                     }
+
+                 }
+                 catch (Exception ex)
+                 {
+                     Destroy(button);
+                 }
+             }
+         }
 
         yield return new WaitForSeconds(0.05f);
     }
 
     private void OnButtonSelectCabinet(Dictionary<string, string> cabInformation)
     {
-
-        Debug.Log("--->" + cabInformation["folderName"]);
-        Debug.Log("--->" + cabInformation["game"]);
-        Debug.Log("--->" + cabInformation["video"]);
-        Debug.Log("--->" + cabInformation["rom"]);
 
         buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
         buttonDelete.GetComponent<Button>().onClick.RemoveAllListeners();

@@ -77,7 +77,7 @@ public class InsertCabinet : MonoBehaviour
         _default.GetComponent<CabinetControllerMR>().insertCabinet = this.gameObject;
         _default.GetComponent<CabinetControllerMR>().isAnchorSaved = isAnchorSaved;
         _default.GetComponent<CabinetControllerMR>().AgentPlayerPositions.Add(Player);
-        _default.GetComponent<CabinetControllerMR>().game.CabinetDBName = cabInformation["rom"];
+        _default.GetComponent<CabinetControllerMR>().game.CabinetDBName = cabInformation["folderName"];
         _default.GetComponent<CabinetControllerMR>().game.Rom = cabInformation["rom"];
         _default.GetComponent<CabinetControllerMR>().game.Position = 0;
 

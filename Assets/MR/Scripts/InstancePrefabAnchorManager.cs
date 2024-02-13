@@ -118,16 +118,36 @@ public class InstancePrefabAnchorManager : MonoBehaviour
                             {
 
                                 var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
+                                Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
 
-                                string game = data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()) ?
-                                data["game"].ToString() :
-                                Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                                string game = "Name Not Found";
 
-                                string video = data.ContainsKey("file") && !string.IsNullOrEmpty(data["file"].ToString()) ?
-                                data["file"].ToString() :
-                                "";
+                                if (data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()))
+                                {
+                                    game = data["game"].ToString();
+                                }
+                                else if (data.ContainsKey("name") && !string.IsNullOrEmpty(data["name"].ToString()))
+                                {
+                                    game = data["name"].ToString();
+                                }
+                                else if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
+                                {
+                                    game = data["rom"].ToString();
+                                }
 
-                                string rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                                string video = "";
+
+                                if (videoData.ContainsKey("file") && !string.IsNullOrEmpty(videoData["file"].ToString()))
+                                {
+                                    video = videoData["file"].ToString();
+                                }
+
+                                string rom = "";
+
+                                if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
+                                {
+                                    rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                                }
 
                                 Dictionary<string, string> cabInformation = new Dictionary<string, string>
                                 {

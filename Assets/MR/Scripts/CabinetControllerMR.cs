@@ -83,8 +83,7 @@ public class CabinetControllerMR : MonoBehaviour
         if (game.CabInfo.Parts != null)
         {
             ConfigManager.WriteConsole($"[CabinetController] {game.CabInfo.name} texture parts");
-            //N seconds to load a cabinet
-            // float waitForSeconds = 1f / game.CabInfo.Parts.Count;
+         
             foreach (CabinetInformation.Part part in game.CabInfo.Parts)
             {
                 yield return new WaitForSeconds(0.01f);
@@ -102,7 +101,7 @@ public class CabinetControllerMR : MonoBehaviour
                 insertCabinet.GetComponent<InsertCabinet>().lastInstance = cab.gameObject;
             }
 
-            GameObject oldEmptyGameObject = GameObject.Find(Path.GetFileNameWithoutExtension(game.CabInfo.rom));
+            GameObject oldEmptyGameObject = GameObject.Find(Path.GetFileNameWithoutExtension(game.CabinetDBName));
 
             if (oldEmptyGameObject)
             {
@@ -110,7 +109,7 @@ public class CabinetControllerMR : MonoBehaviour
             }
 
             GameObject emptyGameObject = new GameObject();
-            emptyGameObject.name = Path.GetFileNameWithoutExtension(game.CabInfo.rom);
+            emptyGameObject.name = Path.GetFileNameWithoutExtension(game.CabinetDBName);
 
             cab.gameObject.transform.SetParent(emptyGameObject.transform);
 
