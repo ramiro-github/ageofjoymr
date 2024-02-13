@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 public class InstancePrefabAnchorManager : MonoBehaviour
 {
@@ -79,6 +81,10 @@ public class InstancePrefabAnchorManager : MonoBehaviour
         string cabinetsdbPath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb");
         DirectoryInfo directoryInfo = new DirectoryInfo(cabinetsdbPath);
 
+        IDeserializer deserializator = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .Build();
+
         if (directoryInfo.Exists)
         {
             DirectoryInfo[] folders = directoryInfo.GetDirectories();
@@ -103,29 +109,50 @@ public class InstancePrefabAnchorManager : MonoBehaviour
                             yield return new WaitForSeconds(1f);
                         }
 
-                        insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(folder.Name, position, rotation, true);
-                        yield return new WaitForSeconds(2f);
+                        string descriptionFilePath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb", folder.Name, "description.yaml");
+                        FileInfo descriptionFile = new FileInfo(descriptionFilePath);
 
-                        GameObject currentCabinet = GameObject.Find(folder.Name);
-
-                        while (currentCabinet == null)
+                        if (descriptionFile.Exists)
                         {
-                            yield return new WaitForSeconds(1f);
-                            currentCabinet = GameObject.Find(folder.Name);
+                            using (var reader = new StreamReader(descriptionFile.FullName))
+                            {
+
+                                var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
+
+                                string game = data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()) ?
+                                data["game"].ToString() :
+                                Path.GetFileNameWithoutExtension(data["rom"].ToString());
+
+                                string video = data.ContainsKey("file") && !string.IsNullOrEmpty(data["file"].ToString()) ?
+                                data["file"].ToString() :
+                                "";
+
+                                string rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
+
+                                Dictionary<string, string> cabInformation = new Dictionary<string, string>
+                                {
+                                    {"folderName", folder.Name},
+                                    {"game", game},
+                                    {"video", video},
+                                    {"rom", rom}
+                                };
+
+                                insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(cabInformation, position, rotation, true);
+                                yield return new WaitForSeconds(2f);
+
+                                GameObject currentCabinet = GameObject.Find(folder.Name);
+
+                                while (currentCabinet == null)
+                                {
+                                    yield return new WaitForSeconds(1f);
+                                    currentCabinet = GameObject.Find(folder.Name);
+                                }
+                            }
                         }
 
                     }
-                    else
-                    {
-                    }
-                }
-                else
-                {
                 }
             }
-        }
-        else
-        {
         }
 
         passthroughLayer.textureOpacity = 1f;

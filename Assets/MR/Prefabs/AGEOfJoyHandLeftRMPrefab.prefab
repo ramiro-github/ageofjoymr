@@ -4437,7 +4437,6 @@ MonoBehaviour:
   ButtonSelectCabinetPrefab: {fileID: 7987001662316555407, guid: 1d8a14a1ed0d6b7449bf9c1bf59067d0, type: 3}
   columns: 1
   rows: 100
-  InsertCabinet: {fileID: 0}
   gameTitle: {fileID: 4047332429717033922}
   painelSelectTransform: {fileID: 3501449773523479423}
   videoPlayer: {fileID: 7271295593503222430}
@@ -4665,7 +4664,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1875965858714069623}
         m_TargetAssemblyTypeName: CabinetMenu, Assembly-CSharp
-        m_MethodName: OnButtonDeleteCabinet
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4799,7 +4798,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1875965858714069623}
         m_TargetAssemblyTypeName: CabinetMenu, Assembly-CSharp
-        m_MethodName: OnButtonInsertCabinet
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

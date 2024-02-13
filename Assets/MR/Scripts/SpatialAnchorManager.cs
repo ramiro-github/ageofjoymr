@@ -23,8 +23,11 @@ public class SpatialAnchorManager : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(loadOVRScene());
-        StartCoroutine(LoadAllAnchor());
+        if (!Application.isEditor)
+        {
+            StartCoroutine(loadOVRScene());
+            StartCoroutine(LoadAllAnchor());
+        }
     }
 
     private IEnumerator loadOVRScene()

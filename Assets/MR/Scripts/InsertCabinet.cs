@@ -24,7 +24,7 @@ public class InsertCabinet : MonoBehaviour
 
     private int countCabinet = 0;
 
-    public string lastNameCabinetInsert = "";
+    private Dictionary<string, string> insertCabInformation = new Dictionary<string, string>();
 
     void Start()
     {
@@ -63,7 +63,7 @@ public class InsertCabinet : MonoBehaviour
         }
     }
 
-    public void instanceCabinet(string lastNameCabinetSelected, Vector3 position, Quaternion rotation, bool isAnchorSaved)
+    public void instanceCabinet(Dictionary<string, string> cabInformation, Vector3 position, Quaternion rotation, bool isAnchorSaved)
     {
 
         while (getFloor == false)
@@ -74,14 +74,14 @@ public class InsertCabinet : MonoBehaviour
         Vector3 positionUpdateFloor = new Vector3(position.x, floorPosition, position.z);
 
         GameObject _default = Instantiate(prefabGabinet, positionUpdateFloor, rotation);
+        _default.GetComponent<CabinetControllerMR>().insertCabinet = this.gameObject;
         _default.GetComponent<CabinetControllerMR>().isAnchorSaved = isAnchorSaved;
         _default.GetComponent<CabinetControllerMR>().AgentPlayerPositions.Add(Player);
-        _default.GetComponent<CabinetControllerMR>().game.CabinetDBName = lastNameCabinetSelected;
-        _default.GetComponent<CabinetControllerMR>().game.Rom = lastNameCabinetSelected;
+        _default.GetComponent<CabinetControllerMR>().game.CabinetDBName = cabInformation["rom"];
+        _default.GetComponent<CabinetControllerMR>().game.Rom = cabInformation["rom"];
         _default.GetComponent<CabinetControllerMR>().game.Position = 0;
 
-        countCabinet++;
-
+        insertCabInformation = cabInformation;
     }
 
     void Update()
@@ -127,9 +127,7 @@ public class InsertCabinet : MonoBehaviour
 
             if (success)
             {
-                Debug.Log("Anchor " + osAnchor.Uuid.ToString());
-
-                string filePath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb", lastNameCabinetInsert, "SpatialAnchor.json");
+                string filePath = Path.Combine(ConfigManager.BaseDir, "cabinetsdb", insertCabInformation["folderName"], "SpatialAnchor.json");
 
                 var UuidObject = new { Uuid = osAnchor.Uuid.ToString() };
 
