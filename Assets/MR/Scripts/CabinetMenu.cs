@@ -108,64 +108,62 @@ public class CabinetMenu : MonoBehaviour
 
     IEnumerator CreateInventory()
     {
-         IDeserializer deserializator = new DeserializerBuilder()
-         .WithNamingConvention(CamelCaseNamingConvention.Instance)
-         .Build();
+        IDeserializer deserializator = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .Build();
 
-         for (int i = 0; i < yamlFilesList.Count; i++)
-         {
-             if (i > limitCabinetList)
-                 break;
+        for (int i = 0; i < yamlFilesList.Count; i++)
+        {
 
-             using (var reader = new StreamReader(yamlFilesList[i].FullName))
-             {
+            using (var reader = new StreamReader(yamlFilesList[i].FullName))
+            {
 
-                 GameObject button = null;
+                GameObject button = null;
 
-                 try
-                 {
+                try
+                {
 
-                     var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
-                     Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
+                    var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
+                    Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
 
-                     button = Instantiate(ButtonSelectCabinetPrefab, painelSelectTransform);
-                     Button btn = button.GetComponent<Button>();
+                    button = Instantiate(ButtonSelectCabinetPrefab, painelSelectTransform);
+                    Button btn = button.GetComponent<Button>();
 
-                     string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
+                    string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
 
-                     string game = "Name Not Found";
+                    string game = "Name Not Found";
 
-                     if (data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()))
-                     {
-                         game = data["game"].ToString();
-                     }
-                     else if (data.ContainsKey("name") && !string.IsNullOrEmpty(data["name"].ToString()))
-                     {
-                         game = data["name"].ToString();
-                     }
-                     else if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
-                     {
-                         game = data["rom"].ToString();
-                     }
+                    if (data.ContainsKey("game") && !string.IsNullOrEmpty(data["game"].ToString()))
+                    {
+                        game = data["game"].ToString();
+                    }
+                    else if (data.ContainsKey("name") && !string.IsNullOrEmpty(data["name"].ToString()))
+                    {
+                        game = data["name"].ToString();
+                    }
+                    else if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
+                    {
+                        game = data["rom"].ToString();
+                    }
 
-                     string video = "";
+                    string video = "";
 
-                     if (videoData.ContainsKey("file") && !string.IsNullOrEmpty(videoData["file"].ToString()))
-                     {
-                         video = videoData["file"].ToString();
-                     }
+                    if (videoData.ContainsKey("file") && !string.IsNullOrEmpty(videoData["file"].ToString()))
+                    {
+                        video = videoData["file"].ToString();
+                    }
 
-                     string rom = "";
+                    string rom = "";
 
-                     if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
-                     {
-                         rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
-                     }
+                    if (data.ContainsKey("rom") && !string.IsNullOrEmpty(data["rom"].ToString()))
+                    {
+                        rom = Path.GetFileNameWithoutExtension(data["rom"].ToString());
+                    }
 
-                     TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
-                     buttonText.text = game;
+                    TextMeshProUGUI buttonText = btn.GetComponentInChildren<TextMeshProUGUI>();
+                    buttonText.text = game;
 
-                     Dictionary<string, string> cabInformation = new Dictionary<string, string>
+                    Dictionary<string, string> cabInformation = new Dictionary<string, string>
                      {
                          {"folderName", folderName},
                          {"game", game},
@@ -173,22 +171,22 @@ public class CabinetMenu : MonoBehaviour
                          {"rom", rom}
                      };
 
-                     btn.onClick.AddListener(() => OnButtonSelectCabinet(cabInformation));
+                    btn.onClick.AddListener(() => OnButtonSelectCabinet(cabInformation));
 
-                     if (i == 0)
-                     {
-                         btn.onClick.Invoke();
-                     }
+                    if (i == 0)
+                    {
+                        btn.onClick.Invoke();
+                    }
 
-                 }
-                 catch (Exception ex)
-                 {
-                     Destroy(button);
-                 }
-             }
-         }
+                }
+                catch (Exception ex)
+                {
+                    Destroy(button);
+                }
+            }
 
-        yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 
     private void OnButtonSelectCabinet(Dictionary<string, string> cabInformation)
@@ -217,11 +215,11 @@ public class CabinetMenu : MonoBehaviour
     public void OnButtonInsertCabinet(Dictionary<string, string> cabInformation)
     {
 
-        if (cabInformation.Count != 0 && !cabinetInserted.Contains(cabInformation["rom"]))
+        if (cabInformation.Count != 0 && !cabinetInserted.Contains(cabInformation["folderName"]))
         {
             buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
 
-            cabinetInserted.Add(cabInformation["rom"]);
+            cabinetInserted.Add(cabInformation["folderName"]);
 
             Vector3 position = new Vector3(0, 0, 0);
 
@@ -240,8 +238,8 @@ public class CabinetMenu : MonoBehaviour
             buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
             buttonDelete.GetComponent<Button>().onClick.RemoveAllListeners();
 
-            cabinetInserted.Remove(cabInformation["rom"]);
-            GameObject oldEmptyGameObject = GameObject.Find(cabInformation["rom"]);
+            cabinetInserted.Remove(cabInformation["folderName"]);
+            GameObject oldEmptyGameObject = GameObject.Find(cabInformation["folderName"]);
 
             if (oldEmptyGameObject)
             {
