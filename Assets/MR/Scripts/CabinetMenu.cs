@@ -21,43 +21,33 @@ public class CabinetMenu : MonoBehaviour
     public GameObject ButtonSelectCabinetPrefab;
     public int columns = 4;
     public int rows = 10;
-
     private int currentIndex = 0;
     private int itemsPerPage = 5;
-
     private GridLayoutGroup gridLayoutGroup;
-
     private List<FileInfo> yamlFilesList = new List<FileInfo>();
-
     private string lastNameCabinetSelected = "";
-
     private GameObject insertCabinetGameObject;
-
     public TextMeshProUGUI gameTitle;
-
     public Transform painelSelectTransform;
-
     public VideoPlayer videoPlayer;
     private List<string> imageExtensions = new List<string>() { "jpg", "jpeg", "png", "gif", "bmp", "tiff", "ico" };
-
     public GameObject Components;
-
     private bool isMenuActive = true;
-
     private bool isKeyPressed = false;
-
     private int limitCabinetList = 9;
-
     private SpatialAnchorManager spatialAnchorManager;
-
     private GameObject lastGameObjectSelect;
-
     public Dictionary<string, string> lastCabInformationSelected = new Dictionary<string, string>();
-
     private GameObject buttonInsert;
     private GameObject buttonDelete;
-
     private List<string> cabinetInserted = new List<string>();
+    public GameObject contentSelectCabinet;
+    public List<GameObject> buttonSelectCabList = new List<GameObject>();
+    private int startList = 0;
+    private int finishList = 9;
+    private int currentPage = 1;
+
+    public TextMeshProUGUI currentPageList;
 
     private void Awake()
     {
@@ -103,10 +93,10 @@ public class CabinetMenu : MonoBehaviour
         }
         yield return new WaitForSeconds(0.05f);
 
-        StartCoroutine(CreateInventory());
+        StartCoroutine(CreateButtonSelectCabList());
     }
 
-    IEnumerator CreateInventory()
+    IEnumerator CreateButtonSelectCabList()
     {
         IDeserializer deserializator = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -114,7 +104,6 @@ public class CabinetMenu : MonoBehaviour
 
         for (int i = 0; i < yamlFilesList.Count; i++)
         {
-
             using (var reader = new StreamReader(yamlFilesList[i].FullName))
             {
 
@@ -126,7 +115,9 @@ public class CabinetMenu : MonoBehaviour
                     var data = deserializator.Deserialize<Dictionary<string, object>>(reader);
                     Dictionary<object, object> videoData = (Dictionary<object, object>)data["video"];
 
-                    button = Instantiate(ButtonSelectCabinetPrefab, painelSelectTransform);
+                    button = Instantiate(ButtonSelectCabinetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+                    button.transform.SetParent(contentSelectCabinet.GetComponent<Transform>(), false);
+                    button.SetActive(false);
                     Button btn = button.GetComponent<Button>();
 
                     string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
@@ -172,12 +163,7 @@ public class CabinetMenu : MonoBehaviour
                      };
 
                     btn.onClick.AddListener(() => OnButtonSelectCabinet(cabInformation));
-
-                    if (i == 0)
-                    {
-                        btn.onClick.Invoke();
-                    }
-
+                    buttonSelectCabList.Add(button);
                 }
                 catch (Exception ex)
                 {
@@ -187,6 +173,8 @@ public class CabinetMenu : MonoBehaviour
 
             yield return new WaitForSeconds(0.05f);
         }
+
+        renderButtonOnList();
     }
 
     private void OnButtonSelectCabinet(Dictionary<string, string> cabInformation)
@@ -226,6 +214,46 @@ public class CabinetMenu : MonoBehaviour
             videoPlayer.Stop();
             videoPlayer.GetComponent<VideoPlayer>().url = null;
             insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(cabInformation, position, Quaternion.identity, false);
+        }
+    }
+
+    private void renderButtonOnList()
+    {
+
+        foreach (Transform child in contentSelectCabinet.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+
+        for (int i = startList; i < finishList && i < buttonSelectCabList.Count; i++)
+        {
+            buttonSelectCabList[i].SetActive(true);
+        }
+    }
+
+    public void OnButtonNextCabList()
+    {
+        if (finishList < buttonSelectCabList.Count)
+        {
+            startList += 9;
+            finishList += 9;
+            currentPage += 1;
+            currentPageList.text = currentPage.ToString();
+            
+            renderButtonOnList();
+        }
+    }
+
+    public void OnButtonBackCabList()
+    {
+        if (startList > 0)
+        {
+            startList -= 9;
+            finishList -= 9;
+            currentPage -= 1;
+            currentPageList.text = currentPage.ToString();
+
+            renderButtonOnList();
         }
     }
 

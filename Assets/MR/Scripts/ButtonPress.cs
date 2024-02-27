@@ -44,6 +44,8 @@ public class ButtonPress : MonoBehaviour
                 }
             }
 
+            Debug.Log("Raycast colidiu com: " + hit.collider.gameObject.name);
+
         }
         else
         {
