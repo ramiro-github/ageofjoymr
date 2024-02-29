@@ -582,6 +582,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: AGEOfJoyHandLeftRMPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 2566141520324743143, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566141520324743143, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566141520324743143, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566141520324743143, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: CabinetMenu, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 4589700142194894901, guid: 522b116e1b6a00b4fa40ec732866e723, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1

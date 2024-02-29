@@ -46,7 +46,7 @@ public class CabinetMenu : MonoBehaviour
     private int startList = 0;
     private int finishList = 9;
     private int currentPage = 1;
-
+    private bool isRenderButtonOnList = true;
     public TextMeshProUGUI currentPageList;
 
     private void Awake()
@@ -93,16 +93,74 @@ public class CabinetMenu : MonoBehaviour
         }
         yield return new WaitForSeconds(0.05f);
 
-        StartCoroutine(CreateButtonSelectCabList());
+        StartCoroutine(renderButtonOnList());
     }
 
-    IEnumerator CreateButtonSelectCabList()
+    private void OnButtonSelectCabinet(Dictionary<string, string> cabInformation)
+    {
+
+        try
+        {
+
+            buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
+            buttonDelete.GetComponent<Button>().onClick.RemoveAllListeners();
+
+            lastCabInformationSelected = cabInformation;
+            gameTitle.text = cabInformation["game"];
+
+            videoPlayer.Stop();
+            videoPlayer.GetComponent<VideoPlayer>().url = null;
+
+            if (cabInformation["video"] != "")
+            {
+                string videoURL = ConfigManager.BaseDir + "/cabinetsdb/" + cabInformation["folderName"] + "/" + cabInformation["video"];
+                videoPlayer.GetComponent<VideoPlayer>().url = videoURL;
+                videoPlayer.Play();
+            }
+
+            buttonInsert.GetComponent<Button>().onClick.AddListener(() => OnButtonInsertCabinet(cabInformation));
+            buttonDelete.GetComponent<Button>().onClick.AddListener(() => OnButtonDeleteCabinet(cabInformation));
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    public void OnButtonInsertCabinet(Dictionary<string, string> cabInformation)
+    {
+
+        if (cabInformation.Count != 0 && !cabinetInserted.Contains(cabInformation["folderName"]))
+        {
+            buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
+
+            cabinetInserted.Add(cabInformation["folderName"]);
+
+            Vector3 position = new Vector3(0, 0, 0);
+
+            videoPlayer.Stop();
+            videoPlayer.GetComponent<VideoPlayer>().url = null;
+            insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(cabInformation, position, Quaternion.identity, false);
+        }
+    }
+
+    IEnumerator renderButtonOnList()
     {
         IDeserializer deserializator = new DeserializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-        .Build();
+      .WithNamingConvention(CamelCaseNamingConvention.Instance)
+      .Build();
 
-        for (int i = 0; i < yamlFilesList.Count; i++)
+        while (contentSelectCabinet.transform.childCount != 0)
+        {
+            foreach (Transform child in contentSelectCabinet.transform)
+            {
+                DestroyImmediate(child.gameObject);
+            }
+        }
+
+        yield return new WaitForSeconds(0.05f);
+
+        for (int i = startList; i < finishList; i++)
         {
             using (var reader = new StreamReader(yamlFilesList[i].FullName))
             {
@@ -117,7 +175,6 @@ public class CabinetMenu : MonoBehaviour
 
                     button = Instantiate(ButtonSelectCabinetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
                     button.transform.SetParent(contentSelectCabinet.GetComponent<Transform>(), false);
-                    button.SetActive(false);
                     Button btn = button.GetComponent<Button>();
 
                     string folderName = Path.GetFileName(yamlFilesList[i].DirectoryName);
@@ -173,74 +230,21 @@ public class CabinetMenu : MonoBehaviour
 
             yield return new WaitForSeconds(0.05f);
         }
-
-        renderButtonOnList();
-    }
-
-    private void OnButtonSelectCabinet(Dictionary<string, string> cabInformation)
-    {
-
-        buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
-        buttonDelete.GetComponent<Button>().onClick.RemoveAllListeners();
-
-        lastCabInformationSelected = cabInformation;
-        gameTitle.text = cabInformation["game"];
-
-        videoPlayer.Stop();
-        videoPlayer.GetComponent<VideoPlayer>().url = null;
-
-        if (cabInformation["video"] != "")
-        {
-            string videoURL = ConfigManager.BaseDir + "/cabinetsdb/" + cabInformation["folderName"] + "/" + cabInformation["video"];
-            videoPlayer.GetComponent<VideoPlayer>().url = videoURL;
-            videoPlayer.Play();
-        }
-
-        buttonInsert.GetComponent<Button>().onClick.AddListener(() => OnButtonInsertCabinet(cabInformation));
-        buttonDelete.GetComponent<Button>().onClick.AddListener(() => OnButtonDeleteCabinet(cabInformation));
-    }
-
-    public void OnButtonInsertCabinet(Dictionary<string, string> cabInformation)
-    {
-
-        if (cabInformation.Count != 0 && !cabinetInserted.Contains(cabInformation["folderName"]))
-        {
-            buttonInsert.GetComponent<Button>().onClick.RemoveAllListeners();
-
-            cabinetInserted.Add(cabInformation["folderName"]);
-
-            Vector3 position = new Vector3(0, 0, 0);
-
-            videoPlayer.Stop();
-            videoPlayer.GetComponent<VideoPlayer>().url = null;
-            insertCabinetGameObject.GetComponent<InsertCabinet>().instanceCabinet(cabInformation, position, Quaternion.identity, false);
-        }
-    }
-
-    private void renderButtonOnList()
-    {
-
-        foreach (Transform child in contentSelectCabinet.transform)
-        {
-            child.gameObject.SetActive(false);
-        }
-
-        for (int i = startList; i < finishList && i < buttonSelectCabList.Count; i++)
-        {
-            buttonSelectCabList[i].SetActive(true);
-        }
     }
 
     public void OnButtonNextCabList()
     {
-        if (finishList < buttonSelectCabList.Count)
+        Debug.Log("-> " + finishList);
+        Debug.Log("-> " + yamlFilesList.Count);
+
+        if (finishList < yamlFilesList.Count)
         {
             startList += 9;
             finishList += 9;
             currentPage += 1;
             currentPageList.text = currentPage.ToString();
-            
-            renderButtonOnList();
+
+            StartCoroutine(renderButtonOnList());
         }
     }
 
@@ -253,7 +257,7 @@ public class CabinetMenu : MonoBehaviour
             currentPage -= 1;
             currentPageList.text = currentPage.ToString();
 
-            renderButtonOnList();
+            StartCoroutine(renderButtonOnList());
         }
     }
 

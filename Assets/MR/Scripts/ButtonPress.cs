@@ -7,19 +7,14 @@ using UnityEngine.UI;
 
 public class ButtonPress : MonoBehaviour
 {
-
-    IEnumerator Haptics(float frequency, float amplitude, float duration, bool rightHand, bool leftHand)
+    IEnumerator delayButtonOnList(Button button)
     {
-        if (rightHand) OVRInput.SetControllerVibration(frequency, amplitude, OVRInput.Controller.RTouch);
-        if (leftHand) OVRInput.SetControllerVibration(frequency, amplitude, OVRInput.Controller.LTouch);
-
-        yield return new WaitForSeconds(duration);
-
-        if (rightHand) OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
-        if (leftHand) OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.LTouch);
+        button.interactable = false;
+        yield return new WaitForSeconds(1.0f);
+        button.interactable = true;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         Vector3 rayOrigin = transform.position;
 
@@ -35,12 +30,20 @@ public class ButtonPress : MonoBehaviour
             {
                 Button button = hit.collider.gameObject.GetComponentInChildren<Button>();
 
-                if (button != null)
+                if (button != null && button.interactable)
                 {
                     OVRInput.SetControllerVibration(.3f, 0.3f, OVRInput.Controller.RTouch);
 
                     button.onClick.Invoke();
                     Debug.Log("Raycast colidiu com: " + hit.collider.gameObject.name);
+
+                    if (
+                        hit.collider.gameObject.name == "PanelButtonNextCabList" ||
+                        hit.collider.gameObject.name == "PanelButtonBackCabList"
+                        )
+                    {
+                        StartCoroutine(delayButtonOnList(button));
+                    }
                 }
             }
 
